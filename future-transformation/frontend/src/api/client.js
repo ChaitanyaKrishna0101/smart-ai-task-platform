@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '',
+  baseURL: 'https://smart-ai-task-platform-3.onrender.com',
   headers: { 'Content-Type': 'application/json' },
 })
 
