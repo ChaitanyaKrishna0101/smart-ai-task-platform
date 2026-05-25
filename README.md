@@ -118,7 +118,7 @@ That's the magic. **This system turns boring document folders into a living, sea
       <video src="https://github.com/user-attachments/assets/abb595af-c217-4502-8d68-c54c1322d8a7" controls width="45%"></video>
     </td>
     <td align="center">
-      <video src="https://github.com/user-attachments/assets/12bafeec-eff4-457a-b1e5-28d4051aef57" controls width="45%"></video>
+      <video src="https://github.com/user-attachments/assets/8c5d1585-3227-47cd-8593-86c31a2d1dbf" controls width="45%"></video>
     </td>
   </tr>
 </table>
