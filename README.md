@@ -95,7 +95,33 @@ That's the magic. **This system turns boring document folders into a living, sea
          ↓                                  ↓
  Time wasted. Work delayed. 😤              Fast. Accurate. Done. 🎉
 ```
-
+---
+<table width="100%">
+  <tr>
+    <td width="50%" align="center"><b>🗂️ Admin Upload Documents</b></td>
+    <td width="50%" align="center"><b>👥 Admin Assign Users</b></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/fb363e09-b9ef-4ce3-b066-0f7c337221e2" controls width="45%"></video>
+    </td>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/502a91cc-92c3-48a0-8d56-0c5680447847" controls width="45%"></video>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><b>✅ Admin Assign Tasks</b></td>
+    <td width="50%" align="center"><b>🔍 User Login & Intelligent Search</b></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/abb595af-c217-4502-8d68-c54c1322d8a7" controls width="45%"></video>
+    </td>
+    <td align="center">
+      <video src="https://github.com/user-attachments/assets/12bafeec-eff4-457a-b1e5-28d4051aef57" controls width="45%"></video>
+    </td>
+  </tr>
+</table>
 ---
 
 ## 🌍 Real World Use Cases
