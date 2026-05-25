@@ -1,35 +1,9 @@
-<div align="center">
-
-<br/>
-
-```
-███████╗████████╗
-██╔════╝╚══██╔══╝
-█████╗     ██║   
-██╔══╝     ██║   
-██║        ██║   
-╚═╝        ╚═╝   
-
-```
-
 # 🧠 Future Transformation
 ### AI-Powered Knowledge & Task Management System
 
-<br/>
+**Live Demo → [smart-ai-task-platform.vercel.app](https://smart-ai-task-platform.vercel.app/)**
 
-> *"Imagine having a super-smart helper inside your company who has read every single document — and can answer any question instantly."*
-> That's exactly what this is. 🚀
-
-<br/>
-
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
-[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_DB-FF6B35?style=for-the-badge)](https://trychroma.com)
-[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
-
-<br/>
+> *Imagine having a super-smart helper inside your company who has read every single document — and can answer any question instantly.*
 
 </div>
 
@@ -37,46 +11,20 @@
 
 ## 📖 Table of Contents
 
-- [🤔 What Is This?](#-what-is-this)
-- [💡 The Problem It Solves](#-the-problem-it-solves)
-- [🌍 Real World Use Cases](#-real-world-use-cases)
-- [✨ Features](#-features)
-- [🏗️ System Architecture](#-system-architecture)
-- [🗄️ Database Design](#-database-design)
-- [🔄 How Data Flows](#-how-data-flows)
-  - [👤 User Flow](#-user-flow)
-  - [📄 Document Flow](#-document-flow)
-  - [🔍 Query & Search Flow](#-query--search-flow)
-  - [🧬 Embeddings Flow](#-embeddings-flow)
-- [📁 Project Structure](#-project-structure)
-- [🚀 Run Locally (Step by Step)](#-run-locally-step-by-step)
-- [🔌 API Reference](#-api-reference)
-- [🖥️ Screenshots](#-screenshots)
-- [🛠️ Tech Stack](#-tech-stack)
+| | |
+|---|---|
+| [🤔 What Is This?](#-what-is-this) | [🔄 How Data Flows](#-how-data-flows) |
+| [💡 The Problem It Solves](#-the-problem-it-solves) | [📁 Project Structure](#-project-structure) |
+| [🖥️ Snapshots](#-snapshots) | [🚀 Run Locally](#-run-locally-step-by-step) |
+| [🌍 Real World Use Cases](#-real-world-use-cases) | [🔌 API Reference](#-api-reference) |
+| [✨ Features](#-features) | [🛠️ Tech Stack](#-tech-stack) |
+| [🏗️ System Architecture](#-system-architecture) | [🗄️ Database Design](#-database-design) |
 
 ---
 
 ## 🤔 What Is This?
 
-Think of it like **"ChatGPT for your company's documents"** — but smarter and safer.
-
-Most companies have tons of documents:
-- 📋 HR policies
-- 🔐 Security guidelines
-- 💻 Onboarding manuals
-- 📊 SOPs and workflows
-
-The problem? **Nobody can find anything quickly.**
-
-> A new employee joins. They want to know: *"How do I apply for emergency leave?"*
-> 
-> Without this system → Open 50-page PDF → Search manually → Ask HR → Wait → Waste time ⏳
-> 
-> With this system → Type the question → AI reads all documents → Get the exact answer in seconds ✅
-
-That's the magic. **This system turns boring document folders into a living, searchable brain.**
-
----
+> Think of it like **"ChatGPT for your company's documents"** — but smarter and safer.
 
 ## 💡 The Problem It Solves
 
@@ -96,17 +44,17 @@ That's the magic. **This system turns boring document folders into a living, sea
  Time wasted. Work delayed. 😤              Fast. Accurate. Done. 🎉
 ```
 ---
-<table width="100%">
+<table width="60%">
   <tr>
     <td width="50%" align="center"><b>🗂️ Admin Upload Documents</b></td>
     <td width="50%" align="center"><b>👥 Admin Assign Users</b></td>
   </tr>
   <tr>
     <td align="center">
-      <video src="https://github.com/user-attachments/assets/fb363e09-b9ef-4ce3-b066-0f7c337221e2" controls width="45%"></video>
+      <video src="https://github.com/user-attachments/assets/fb363e09-b9ef-4ce3-b066-0f7c337221e2" width="20%"></video>
     </td>
     <td align="center">
-      <video src="https://github.com/user-attachments/assets/502a91cc-92c3-48a0-8d56-0c5680447847" controls width="45%"></video>
+      <video src="https://github.com/user-attachments/assets/502a91cc-92c3-48a0-8d56-0c5680447847" width="20%"></video>
     </td>
   </tr>
   <tr>
@@ -115,10 +63,10 @@ That's the magic. **This system turns boring document folders into a living, sea
   </tr>
   <tr>
     <td align="center">
-      <video src="https://github.com/user-attachments/assets/abb595af-c217-4502-8d68-c54c1322d8a7" controls width="45%"></video>
+      <video src="https://github.com/user-attachments/assets/abb595af-c217-4502-8d68-c54c1322d8a7" width="20%"></video>
     </td>
     <td align="center">
-      <video src="https://github.com/user-attachments/assets/8c5d1585-3227-47cd-8593-86c31a2d1dbf" controls width="45%"></video>
+      <video src="https://github.com/user-attachments/assets/8c5d1585-3227-47cd-8593-86c31a2d1dbf" width="20%"></video>
     </td>
   </tr>
 </table>
