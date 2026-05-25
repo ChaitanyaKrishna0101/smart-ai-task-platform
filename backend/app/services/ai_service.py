@@ -1,5 +1,3 @@
-import json
-import os
 import math
 from google import genai
 from google.genai import types
@@ -17,35 +15,16 @@ def _get_client():
     global _client
     if _client is None:
         if not settings.GEMINI_API_KEY:
-            raise ValueError("GEMINI_API_KEY is not configured. Please set it in Secrets.")
+            raise ValueError("GEMINI_API_KEY is not configured.")
         _client = genai.Client(api_key=settings.GEMINI_API_KEY)
     return _client
 
 
 # =========================================================
-# PURE-PYTHON VECTOR STORE (replaces chromadb)
-# No C++ compilation required — works on all platforms
+# POSTGRESQL-BACKED VECTOR STORE
 # =========================================================
 
 class _VectorStore:
-    def __init__(self, path: str):
-        self._path = path
-        self._file = os.path.join(path, "vectors.json")
-        os.makedirs(path, exist_ok=True)
-        self._chunks: list = self._load()
-
-    def _load(self) -> list:
-        if os.path.exists(self._file):
-            try:
-                with open(self._file, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        return []
-
-    def _save(self):
-        with open(self._file, "w", encoding="utf-8") as f:
-            json.dump(self._chunks, f)
 
     @staticmethod
     def _cosine_distance(a: List[float], b: List[float]) -> float:
@@ -57,40 +36,71 @@ class _VectorStore:
         return 1.0 - dot / (mag_a * mag_b)
 
     def count(self) -> int:
-        return len(self._chunks)
+        from ..core.database import SessionLocal
+        from ..models.vector_chunk import VectorChunk
+        db = SessionLocal()
+        try:
+            return db.query(VectorChunk).count()
+        finally:
+            db.close()
 
     def get_ids_for_doc(self, doc_id: int) -> List[str]:
-        return [c["id"] for c in self._chunks if c["doc_id"] == doc_id]
+        from ..core.database import SessionLocal
+        from ..models.vector_chunk import VectorChunk
+        db = SessionLocal()
+        try:
+            rows = db.query(VectorChunk).filter(VectorChunk.doc_id == doc_id).all()
+            return [r.id for r in rows]
+        finally:
+            db.close()
 
     def delete(self, ids: List[str]):
-        id_set = set(ids)
-        self._chunks = [c for c in self._chunks if c["id"] not in id_set]
-        self._save()
+        from ..core.database import SessionLocal
+        from ..models.vector_chunk import VectorChunk
+        db = SessionLocal()
+        try:
+            db.query(VectorChunk).filter(VectorChunk.id.in_(ids)).delete(synchronize_session=False)
+            db.commit()
+        finally:
+            db.close()
 
     def add(self, ids: List[str], documents: List[str],
             embeddings: List[List[float]], doc_ids: List[int]):
-        for chunk_id, text, embedding, doc_id in zip(ids, documents, embeddings, doc_ids):
-            self._chunks.append({
-                "id": chunk_id,
-                "text": text,
-                "embedding": embedding,
-                "doc_id": doc_id,
-            })
-        self._save()
+        from ..core.database import SessionLocal
+        from ..models.vector_chunk import VectorChunk
+        db = SessionLocal()
+        try:
+            for chunk_id, text, embedding, doc_id in zip(ids, documents, embeddings, doc_ids):
+                db.add(VectorChunk(
+                    id=chunk_id,
+                    doc_id=doc_id,
+                    text=text,
+                    embedding=embedding
+                ))
+            db.commit()
+        finally:
+            db.close()
 
     def query(self, query_embedding: List[float],
               n_results: int) -> List[Tuple[str, int, float]]:
-        if not self._chunks:
-            return []
-        scored = [
-            (c["text"], c["doc_id"], self._cosine_distance(query_embedding, c["embedding"]))
-            for c in self._chunks
-        ]
-        scored.sort(key=lambda x: x[2])
-        return scored[:n_results]
+        from ..core.database import SessionLocal
+        from ..models.vector_chunk import VectorChunk
+        db = SessionLocal()
+        try:
+            chunks = db.query(VectorChunk).all()
+            if not chunks:
+                return []
+            scored = [
+                (c.text, c.doc_id, self._cosine_distance(query_embedding, c.embedding))
+                for c in chunks
+            ]
+            scored.sort(key=lambda x: x[2])
+            return scored[:n_results]
+        finally:
+            db.close()
 
 
-_store = _VectorStore(path=settings.CHROMA_DIR)
+_store = _VectorStore()
 
 
 # =========================================================
@@ -126,7 +136,7 @@ def _chunk_text(text: str) -> List[str]:
         overlap = max(1, chunk_size // 4)
     chunks, start = [], 0
     while start < len(words):
-        chunk = " ".join(words[start : start + chunk_size]).strip()
+        chunk = " ".join(words[start: start + chunk_size]).strip()
         if len(chunk) > 30:
             chunks.append(chunk)
         start += chunk_size - overlap

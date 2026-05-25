@@ -5,13 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import init_db
 
-from app.models import user, document, task, activity_log  # noqa
+from app.models import user, document, task, activity_log, vector_chunk  # noqa
 from app.routes import auth, users, documents, tasks, search, analytics
 
 init_db()
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-os.makedirs(settings.CHROMA_DIR, exist_ok=True)
 
 app = FastAPI(
     title="Future Transformation — Knowledge Management API",
