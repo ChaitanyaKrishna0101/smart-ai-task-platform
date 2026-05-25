@@ -51,3 +51,5 @@ export const searchDocs = (data) => api.post('/search/', data)
 
 // Analytics
 export const getAnalytics = () => api.get('/analytics/')
+
+// force rebuild
