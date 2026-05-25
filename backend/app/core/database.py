@@ -21,10 +21,19 @@ def init_db():
         bind=engine
     )
 
-    # CREATE TABLES HERE (SAFE PLACE)
+    # import models so tables are registered
     from app.models import user, document, task, activity_log  # noqa
     Base.metadata.create_all(bind=engine)
 
 
 class Base(DeclarativeBase):
     pass
+
+
+# ✅ THIS WAS MISSING (CRITICAL)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
