@@ -108,3 +108,6 @@ def seed_admin():
             print("✅ Default admin created")
     finally:
         db.close()
+
+
+seed_admin()
