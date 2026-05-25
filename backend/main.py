@@ -5,21 +5,20 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from app.core.config import settings
-from app.core.database import init_db, engine, Base
+from app.core.database import init_db
 
 from app.models import user, document, task, activity_log  # noqa
 from app.routes import auth, users, documents, tasks, search, analytics
 
 
 # =========================
-# DB INITIALIZATION (FIXED)
+# INIT DB (SAFE)
 # =========================
 init_db()
-Base.metadata.create_all(bind=engine)
 
 
 # =========================
-# FOLDER SETUP
+# CREATE FOLDERS
 # =========================
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.CHROMA_DIR, exist_ok=True)
@@ -68,7 +67,7 @@ def health():
 
 
 # =========================
-# STATIC FRONTEND
+# STATIC FRONTEND (OPTIONAL)
 # =========================
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 
@@ -81,8 +80,7 @@ if os.path.isdir(STATIC_DIR):
 
     @app.get("/{full_path:path}")
     def serve_spa(full_path: str):
-        index = os.path.join(STATIC_DIR, "index.html")
-        return FileResponse(index)
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 # =========================
@@ -107,9 +105,6 @@ def seed_admin():
                 )
             )
             db.commit()
-            print("✅ Default admin created: admin@futuretransformation.com / Admin@123")
+            print("✅ Default admin created")
     finally:
         db.close()
-
-
-seed_admin()
