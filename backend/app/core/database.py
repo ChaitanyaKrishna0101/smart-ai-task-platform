@@ -28,8 +28,12 @@ def init_db():
     from app.models import user, document, task, activity_log  # noqa
     Base.metadata.create_all(bind=engine)
 
+    print(f"✅ Database initialized")
+
 
 def get_db():
+    if SessionLocal is None:
+        raise RuntimeError("Database not initialized. Call init_db() first.")
     db = SessionLocal()
     try:
         yield db
