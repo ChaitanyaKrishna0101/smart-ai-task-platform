@@ -1,20 +1,15 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import init_db
 
-# Import models so SQLAlchemy registers them
 from app.models import user, document, task, activity_log  # noqa
-
 from app.routes import auth, users, documents, tasks, search, analytics
 
-# Create all tables
-Base.metadata.create_all(bind=engine)
+init_db()
 
-# Ensure upload dir exists
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.CHROMA_DIR, exist_ok=True)
 
@@ -46,7 +41,6 @@ def health():
     return {"status": "ok", "app": settings.APP_NAME}
 
 
-# Seed default admin on first run
 from app.core.security import hash_password
 from app.core.database import SessionLocal
 from app.models.user import User
