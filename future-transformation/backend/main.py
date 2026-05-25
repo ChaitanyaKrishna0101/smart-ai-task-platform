@@ -27,8 +27,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "*"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -55,8 +55,12 @@ from app.models.user import User
 def seed_admin():
     db = SessionLocal()
     try:
-        admin = db.query(User).filter(User.role == "admin").first()
-        if not admin:
+        admin = db.query(User).filter(User.email == "admin@futuretransformation.com").first()
+        if admin:
+            admin.hashed_password = hash_password("Admin@123")
+            db.commit()
+            print("✅ Admin password reset")
+        else:
             db.add(
                 User(
                     name="Admin",
@@ -66,7 +70,7 @@ def seed_admin():
                 )
             )
             db.commit()
-            print("✅ Default admin created: admin@futuretransformation.com / Admin@123")
+            print("✅ Default admin created")
     finally:
         db.close()
 
