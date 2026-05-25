@@ -1,75 +1,37 @@
-import os
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from app.core.config import settings
-from app.core.database import init_db, Base
 
-# Import models so SQLAlchemy registers them
-from app.models import user, document, task, activity_log  # noqa
-from app.routes import auth, users, documents, tasks, search, analytics
-
-# Initialize DB (creates engine, SessionLocal, tables)
-init_db()
-
-# Ensure upload dir exists
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-os.makedirs(settings.CHROMA_DIR, exist_ok=True)
-
-app = FastAPI(
-    title="Future Transformation — Knowledge Management API",
-    version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(documents.router)
-app.include_router(tasks.router)
-app.include_router(search.router)
-app.include_router(analytics.router)
+engine = None
+SessionLocal = None
 
 
-@app.get("/health")
-def health():
-    return {"status": "ok", "app": settings.APP_NAME}
+class Base(DeclarativeBase):
+    pass
 
 
-from app.core.security import hash_password
-from app.core.database import SessionLocal
-from app.models.user import User
+def init_db():
+    global engine, SessionLocal
+
+    engine = create_engine(
+        settings.DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+    )
+
+    SessionLocal = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine
+    )
+
+    from app.models import user, document, task, activity_log  # noqa
+    Base.metadata.create_all(bind=engine)
 
 
-def seed_admin():
+def get_db():
     db = SessionLocal()
     try:
-        admin = db.query(User).filter(User.email == "admin@futuretransformation.com").first()
-        if admin:
-            admin.hashed_password = hash_password("Admin@123")
-            db.commit()
-            print("✅ Admin password reset")
-        else:
-            db.add(
-                User(
-                    name="Admin",
-                    email="admin@futuretransformation.com",
-                    hashed_password=hash_password("Admin@123"),
-                    role="admin",
-                )
-            )
-            db.commit()
-            print("✅ Default admin created")
+        yield db
     finally:
         db.close()
-
-
-seed_admin()
