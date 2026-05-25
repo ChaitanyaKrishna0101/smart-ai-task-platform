@@ -1,20 +1,33 @@
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import init_db, engine, Base
 
 from app.models import user, document, task, activity_log  # noqa
 from app.routes import auth, users, documents, tasks, search, analytics
 
+
+# =========================
+# DB INITIALIZATION (FIXED)
+# =========================
+init_db()
 Base.metadata.create_all(bind=engine)
 
+
+# =========================
+# FOLDER SETUP
+# =========================
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.CHROMA_DIR, exist_ok=True)
 
+
+# =========================
+# FASTAPI APP
+# =========================
 app = FastAPI(
     title="Future Transformation — Knowledge Management API",
     version="1.0.0",
@@ -22,6 +35,10 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
+
+# =========================
+# CORS
+# =========================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,6 +47,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# =========================
+# ROUTES
+# =========================
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(documents.router)
@@ -38,15 +59,25 @@ app.include_router(search.router)
 app.include_router(analytics.router)
 
 
+# =========================
+# HEALTH CHECK
+# =========================
 @app.get("/health")
 def health():
     return {"status": "ok", "app": settings.APP_NAME}
 
 
+# =========================
+# STATIC FRONTEND
+# =========================
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 
 if os.path.isdir(STATIC_DIR):
-    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+    app.mount(
+        "/assets",
+        StaticFiles(directory=os.path.join(STATIC_DIR, "assets")),
+        name="assets",
+    )
 
     @app.get("/{full_path:path}")
     def serve_spa(full_path: str):
@@ -54,6 +85,9 @@ if os.path.isdir(STATIC_DIR):
         return FileResponse(index)
 
 
+# =========================
+# SEED ADMIN USER
+# =========================
 from app.core.security import hash_password
 from app.core.database import SessionLocal
 from app.models.user import User
