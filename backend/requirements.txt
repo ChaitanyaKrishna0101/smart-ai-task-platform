@@ -8,7 +8,7 @@ passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 python-multipart==0.0.6
 groq==0.9.0
-sentence-transformers==3.0.1
+fastembed==0.3.6
 email-validator==2.2.0
 pypdf2==3.0.1
 pdfminer.six==20221105
