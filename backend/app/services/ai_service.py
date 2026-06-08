@@ -1,12 +1,12 @@
 import math
 from groq import Groq
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 from typing import List, Tuple
 from ..core.config import settings
 
 
 # =========================================================
-# GROQ CLIENT (replaces Gemini)
+# GROQ CLIENT
 # =========================================================
 
 _client = None
@@ -21,7 +21,7 @@ def _get_client():
 
 
 # =========================================================
-# SENTENCE TRANSFORMER (replaces Gemini embeddings)
+# FASTEMBED MODEL (replaces sentence-transformers)
 # =========================================================
 
 _embedding_model = None
@@ -29,7 +29,7 @@ _embedding_model = None
 def _get_embedding_model():
     global _embedding_model
     if _embedding_model is None:
-        _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+        _embedding_model = TextEmbedding("BAAI/bge-small-en-v1.5")
     return _embedding_model
 
 
@@ -117,13 +117,13 @@ _store = _VectorStore()
 
 
 # =========================================================
-# EMBEDDINGS (sentence-transformers replaces Gemini)
+# EMBEDDINGS (fastembed replaces sentence-transformers)
 # =========================================================
 
 def _get_embedding(text: str) -> List[float]:
     try:
         model = _get_embedding_model()
-        embedding = model.encode(text, convert_to_numpy=True)
+        embedding = list(model.embed([text]))[0]
         return embedding.tolist()
     except Exception as e:
         print("EMBEDDING ERROR:", str(e))
@@ -229,7 +229,7 @@ def semantic_search(query: str, n_results: int = 5) -> List[Tuple[str, int, floa
 
 
 # =========================================================
-# GENERATE ANSWER (Groq replaces Gemini)
+# GENERATE ANSWER (Groq)
 # =========================================================
 
 def generate_answer(query: str, context_chunks: List[str]) -> str:
