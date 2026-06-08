@@ -1,12 +1,12 @@
 import math
-from google import genai
-from google.genai import types
+from groq import Groq
+from sentence_transformers import SentenceTransformer
 from typing import List, Tuple
 from ..core.config import settings
 
 
 # =========================================================
-# GEMINI CLIENT (lazy)
+# GROQ CLIENT (replaces Gemini)
 # =========================================================
 
 _client = None
@@ -14,14 +14,27 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        if not settings.GEMINI_API_KEY:
-            raise ValueError("GEMINI_API_KEY is not configured.")
-        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        if not settings.GROQ_API_KEY:
+            raise ValueError("GROQ_API_KEY is not configured.")
+        _client = Groq(api_key=settings.GROQ_API_KEY)
     return _client
 
 
 # =========================================================
-# POSTGRESQL-BACKED VECTOR STORE
+# SENTENCE TRANSFORMER (replaces Gemini embeddings)
+# =========================================================
+
+_embedding_model = None
+
+def _get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _embedding_model
+
+
+# =========================================================
+# POSTGRESQL-BACKED VECTOR STORE (unchanged)
 # =========================================================
 
 class _VectorStore:
@@ -104,24 +117,21 @@ _store = _VectorStore()
 
 
 # =========================================================
-# EMBEDDINGS
+# EMBEDDINGS (sentence-transformers replaces Gemini)
 # =========================================================
 
 def _get_embedding(text: str) -> List[float]:
     try:
-        response = _get_client().models.embed_content(
-            model="gemini-embedding-001",
-            contents=text,
-            config=types.EmbedContentConfig(task_type="SEMANTIC_SIMILARITY"),
-        )
-        return response.embeddings[0].values
+        model = _get_embedding_model()
+        embedding = model.encode(text, convert_to_numpy=True)
+        return embedding.tolist()
     except Exception as e:
         print("EMBEDDING ERROR:", str(e))
         raise
 
 
 # =========================================================
-# TEXT CHUNKING
+# TEXT CHUNKING (unchanged)
 # =========================================================
 
 def _chunk_text(text: str) -> List[str]:
@@ -144,7 +154,7 @@ def _chunk_text(text: str) -> List[str]:
 
 
 # =========================================================
-# INDEX DOCUMENT
+# INDEX DOCUMENT (unchanged)
 # =========================================================
 
 def index_document(doc_id: int, text: str) -> int:
@@ -186,7 +196,7 @@ def index_document(doc_id: int, text: str) -> int:
 
 
 # =========================================================
-# DELETE DOCUMENT
+# DELETE DOCUMENT (unchanged)
 # =========================================================
 
 def delete_document(doc_id: int):
@@ -200,7 +210,7 @@ def delete_document(doc_id: int):
 
 
 # =========================================================
-# SEMANTIC SEARCH
+# SEMANTIC SEARCH (unchanged)
 # =========================================================
 
 def semantic_search(query: str, n_results: int = 5) -> List[Tuple[str, int, float]]:
@@ -219,7 +229,7 @@ def semantic_search(query: str, n_results: int = 5) -> List[Tuple[str, int, floa
 
 
 # =========================================================
-# GENERATE ANSWER
+# GENERATE ANSWER (Groq replaces Gemini)
 # =========================================================
 
 def generate_answer(query: str, context_chunks: List[str]) -> str:
@@ -247,12 +257,23 @@ USER QUESTION:
 ANSWER:"""
 
         print("\nGENERATING ANSWER...")
-        response = _get_client().models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
+        response = _get_client().chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful AI assistant for Future Transformation company. Answer only from the provided document context. Do not make up information."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.2,
+            max_tokens=1024,
         )
         print("ANSWER GENERATED")
-        return response.text.strip()
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
         print("ANSWER GENERATION ERROR:", str(e))
